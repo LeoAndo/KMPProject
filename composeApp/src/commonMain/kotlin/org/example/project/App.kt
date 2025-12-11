@@ -51,7 +51,7 @@ fun App() {
                 val greeting = Greeting().greet()
                 Column(
                     Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     // Compose Multiplatformのロゴを表示
                     Image(painterResource(Res.drawable.compose_multiplatform), null)
