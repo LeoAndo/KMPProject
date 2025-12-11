@@ -29,35 +29,27 @@ import kotlinx.coroutines.launch
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 /**
- * アプリケーションのメインComposable。
- * AppTheme配下でクイズ画面全体を構成し、進行状態・結果表示・通知をまとめて扱う。
- *
- * 利用例:
- * ```
- * @Composable
- * fun Root() {
- *     App() // そのまま呼び出すだけでクイズ画面を描画
- * }
- * ```
+ * アプリケーションのメインComposable関数。
+ * UIの状態を保持し、ユーザーインタラクションに応じてコンテンツの表示を切り替えます。
+ * MaterialTheme内でクイズの進行・通知・レイアウトを一括して組み立てます。
  */
 @Composable
 @Preview
 fun App() {
     AppTheme {
-        // クイズの進行・通知・スクロール状態を Compose スコープ内で保持する。
+        // 通知用スナックバーの状態。表示中のものを閉じてから新しいメッセージを出すため共有する。
         val hostState = remember { SnackbarHostState() }
-        // 出題位置を保持するページャー。ユーザーが自由にスワイプしないようスクロール不可にしている。
+        // 出題の現在位置を保持するページャー。ユーザースクロールを無効化し、回答ボタン操作のみで遷移させる。
         val pagerState = rememberPagerState(pageCount = { Question.entries.size })
-        // ページ遷移やスナックバー表示を非同期で行うためのスコープ。
+        // ページ移動やスナックバー表示を非同期で行うための Coroutine スコープ。
         val scope = rememberCoroutineScope()
-        // 縦方向のスクロール状態。小さい画面でも縦スクロールで全要素を確認できる。
+        // 縦スクロール状態。小画面でもすべてのコンポーネントが見えるようにする。
         val scrollState = rememberScrollState()
-        // 最終問題まで回答したかどうか。
+        // 全問回答が完了したかどうかのフラグ。true になると結果表示とリスタート導線が出る。
         var isFinishedQuiz by remember { mutableStateOf(false) }
-        // 現時点での正解数。
+        // 正解数カウント。正解判定のたびに加算し、結果表示に利用する。
         var collectAnswerCount by remember { mutableStateOf(0) }
 
-        // 画面骨組み。Snackbar の描画位置や全体の余白を提供する。
         Scaffold(
             modifier = Modifier.fillMaxSize(),
             snackbarHost = { SnackbarHost(hostState = hostState) }
@@ -87,10 +79,10 @@ fun App() {
                                 .padding(12.dp), // 文字の周りに余白を追加する
                             contentAlignment = Alignment.Center
                         ) {
-                            // ordinal で現在ページに一致する問題文を取得。
-                            val message = Question.entries.first { it.ordinal == pageIndex }.message
+                            // 表示中の問題文。長い文でも省略表示され、コンテナ中央に配置される。
+                            val message = Question.entries[pageIndex].message
                             Text(
-                                text = message, // TODO 仮でテキストにページインデックスを表示する
+                                text = message,
                                 overflow = TextOverflow.Ellipsis,
                             )
                         }
@@ -98,10 +90,11 @@ fun App() {
                 }
 
                 if (isFinishedQuiz) {
-                    // 全問回答後のリザルト表示とリセット導線。
+                    // 全問回答後のリザルト表示とリセット導線。正解数をまとめて伝える。
                     Text("${collectAnswerCount}問正解しました")
                     Button(onClick = {
                         scope.launch {
+                            // 最初の問題へ戻り、状態を初期化して再スタート可能にする。
                             pagerState.scrollToPage(page = 0)
                             collectAnswerCount = 0
                             isFinishedQuiz = false
@@ -111,9 +104,7 @@ fun App() {
                     }
                 }
 
-                // ページャーの現在位置に対応する問題を選択肢描画のために取得。
-                val question = Question.entries
-                    .first { question -> question.ordinal == pagerState.currentPage }
+                val question = Question.entries[pagerState.currentPage]
                 question.answers.forEachIndexed { index, answerText ->
                     // 選択肢ボタン: 正誤判定しスナックバー表示後、必要に応じて次ページへ遷移。
                     Button(
@@ -121,9 +112,10 @@ fun App() {
                         modifier = Modifier.widthIn(max = 320.dp).fillMaxWidth(0.5f),
                         onClick = {
                             scope.launch {
-                                isFinishedQuiz =
-                                    Question.entries.size <= pagerState.currentPage + 1
+                                // 最終問題に到達したか判定し、結果表示へ切り替えるかを決める。
+                                isFinishedQuiz = pagerState.currentPage + 1 == Question.entries.size
                                 if (!isFinishedQuiz) {
+                                    // 次の問題へページ送りし、回答直後の誤操作を防ぐためスクロールは固定。
                                     pagerState.scrollToPage(page = pagerState.currentPage + 1)
                                 }
                                 val message = if (question.answerIndex == index) {
@@ -132,7 +124,6 @@ fun App() {
                                 } else {
                                     "不正解です！"
                                 }
-                                // 連続押下時でも最新のメッセージだけが表示されるように既存を閉じてから表示する。
                                 hostState.currentSnackbarData?.dismiss()
                                 hostState.showSnackbar(message)
                             }
