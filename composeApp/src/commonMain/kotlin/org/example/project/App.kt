@@ -60,7 +60,7 @@ fun App() {
 
         Scaffold(
             modifier = Modifier.fillMaxSize(),
-            snackbarHost = { SnackbarHost(hostState = hostState) }
+            snackbarHost = { SnackbarHost(hostState = hostState) },
         ) { innerPadding ->
             Column(
                 modifier = Modifier
@@ -77,7 +77,7 @@ fun App() {
                 ) { pageIndex ->
                     Box(
                         modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
+                        contentAlignment = Alignment.Center,
                     ) {
                         Box(
                             modifier = Modifier
@@ -85,7 +85,7 @@ fun App() {
                                 .aspectRatio(1f)
                                 .background(color = MaterialTheme.colorScheme.secondaryContainer)
                                 .padding(12.dp), // 文字の周りに余白を追加する
-                            contentAlignment = Alignment.Center
+                            contentAlignment = Alignment.Center,
                         ) {
                             // 表示中の問題文。長い文でも省略表示され、コンテナ中央に配置される。
                             val message = Question.entries[pageIndex].message
@@ -141,11 +141,10 @@ fun App() {
                             text = answerText,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Bold,
                         )
                     }
                 }
-
             }
         }
     }
