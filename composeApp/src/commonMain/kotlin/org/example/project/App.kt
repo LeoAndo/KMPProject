@@ -32,19 +32,11 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
  * アプリケーションのメインComposable関数。
  * UIの状態を保持し、ユーザーインタラクションに応じてコンテンツの表示を切り替えます。
  * MaterialTheme内でクイズの進行・通知・レイアウトを一括して組み立てます。
- *
- * 利用例:
- * ```
- * @Composable
- * fun QuizScreen() {
- *     App() // ルートComposableからそのまま呼び出してクイズ画面を構築する
- * }
- * ```
  */
 @Composable
 @Preview
 fun App() {
-    MaterialTheme {
+    AppTheme {
         // 通知用スナックバーの状態。表示中のものを閉じてから新しいメッセージを出すため共有する。
         val hostState = remember { SnackbarHostState() }
         // 出題の現在位置を保持するページャー。ユーザースクロールを無効化し、回答ボタン操作のみで遷移させる。
@@ -60,7 +52,7 @@ fun App() {
 
         Scaffold(
             modifier = Modifier.fillMaxSize(),
-            snackbarHost = { SnackbarHost(hostState = hostState) }
+            snackbarHost = { SnackbarHost(hostState = hostState) },
         ) { innerPadding ->
             Column(
                 modifier = Modifier
@@ -77,7 +69,7 @@ fun App() {
                 ) { pageIndex ->
                     Box(
                         modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
+                        contentAlignment = Alignment.Center,
                     ) {
                         Box(
                             modifier = Modifier
@@ -85,7 +77,7 @@ fun App() {
                                 .aspectRatio(1f)
                                 .background(color = MaterialTheme.colorScheme.secondaryContainer)
                                 .padding(12.dp), // 文字の周りに余白を追加する
-                            contentAlignment = Alignment.Center
+                            contentAlignment = Alignment.Center,
                         ) {
                             // 表示中の問題文。長い文でも省略表示され、コンテナ中央に配置される。
                             val message = Question.entries[pageIndex].message
@@ -141,11 +133,10 @@ fun App() {
                             text = answerText,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Bold,
                         )
                     }
                 }
-
             }
         }
     }
