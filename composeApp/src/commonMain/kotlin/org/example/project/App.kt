@@ -20,15 +20,6 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 
 /**
  * アプリ全体のエントリーポイントとなるComposable。
- *
- * 利用例:
- * ```
- * @Composable
- * fun Root() {
- *     // アプリのUIはこのComposableを呼び出すだけで構築される
- *     App()
- * }
- * ```
  */
 @Composable
 @Preview
