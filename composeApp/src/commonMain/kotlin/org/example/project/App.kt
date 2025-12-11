@@ -60,7 +60,7 @@ fun App() {
         // 画面骨組み。Snackbar の描画位置や全体の余白を提供する。
         Scaffold(
             modifier = Modifier.fillMaxSize(),
-            snackbarHost = { SnackbarHost(hostState = hostState) }
+            snackbarHost = { SnackbarHost(hostState = hostState) },
         ) { innerPadding ->
             Column(
                 modifier = Modifier
@@ -77,7 +77,7 @@ fun App() {
                 ) { pageIndex ->
                     Box(
                         modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
+                        contentAlignment = Alignment.Center,
                     ) {
                         Box(
                             modifier = Modifier
@@ -85,7 +85,7 @@ fun App() {
                                 .aspectRatio(1f)
                                 .background(color = MaterialTheme.colorScheme.secondaryContainer)
                                 .padding(12.dp), // 文字の周りに余白を追加する
-                            contentAlignment = Alignment.Center
+                            contentAlignment = Alignment.Center,
                         ) {
                             // ordinal で現在ページに一致する問題文を取得。
                             val message = Question.entries.first { it.ordinal == pageIndex }.message
@@ -142,11 +142,10 @@ fun App() {
                             text = answerText,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Bold,
                         )
                     }
                 }
-
             }
         }
     }
